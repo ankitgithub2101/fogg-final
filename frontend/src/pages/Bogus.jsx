@@ -122,13 +122,13 @@ function Bogus() {
             <div key={f._id} className="bg-gray-100 p-2 rounded flex flex-col items-center gap-2">
               {f.mimetype.startsWith("image/") ? (
                 <img
-                  src={`https://fogg-final.netlify.app/${f.path}`}
+                  src={`https://fogg-final.onrender.com/${f.path}`}
                   alt={f.originalname}
                   className="w-30 rounded"
                 />
               ) : (
                 <a
-                  href={`https://fogg-final.netlify.app/${f.path}`}
+                  href={`https://fogg-final.onrender.com/${f.path}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-blue-600 underline"
