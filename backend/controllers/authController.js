@@ -107,53 +107,66 @@ exports.getUsers = async (req, res) => {
 
 
 // forgetpass
-const sgMail = require("@sendgrid/mail");
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-exports.forgotPasswordEmail = async (req, res) => {
-  const { email, favFood } = req.body;
-
-  if (!email || !favFood) {
-    return res.status(400).json({ message: "Email and favorite food are required" });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const isFavFoodCorrect = await bcrypt.compare(favFood.toLowerCase(), user.favFood);
-    if (!isFavFoodCorrect)
-      return res.status(401).json({ message: "Favorite food does not match" });
-
-    // Generate reset token
-    const token = crypto.randomBytes(32).toString("hex");
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    await user.save();
-
-    // Build reset URL
-    const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
-
-    // Send email via SendGrid
-    await sgMail.send({
-      to: user.email,
-      from: "ashinde354@gmail.com", // must be verified in SendGrid
-      subject: "Password Reset Request",
-      html: `
-        <p>Hello ${user.name},</p>
-        <p>You requested a password reset. Click the link below to reset your password. Token expires in 1 hour.</p>
-        <p><a href="${resetURL}">Reset Password</a></p>
-      `,
-    });
-
-    // Respond to frontend
-    res.json({ message: "Reset link sent to your email" });
-
-  } catch (err) {
-    console.error("SendGrid error:", err);
-    res.status(500).json({ message: "Could not send reset email. Contact admin." });
-  }
+const msg = {
+  to: 'ashinde354@gmail.com',        // your recipient
+  from: 'ashinde354@gmail.com',      // verified sender
+  subject: 'SendGrid Test Email',
+  text: 'Hello! This is a test email using SendGrid API',
+  html: '<strong>Hello! This is a test email using SendGrid API</strong>',
 };
+
+sgMail
+  .send(msg)
+  .then(() => console.log('Email sent successfully!'))
+  .catch((err) => console.error('SendGrid error:', err));
+
+// exports.forgotPasswordEmail = async (req, res) => {
+//   const { email, favFood } = req.body;
+
+//   if (!email || !favFood) {
+//     return res.status(400).json({ message: "Email and favorite food are required" });
+//   }
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     const isFavFoodCorrect = await bcrypt.compare(favFood.toLowerCase(), user.favFood);
+//     if (!isFavFoodCorrect)
+//       return res.status(401).json({ message: "Favorite food does not match" });
+
+//     // Generate reset token
+//     const token = crypto.randomBytes(32).toString("hex");
+//     user.resetPasswordToken = token;
+//     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+//     await user.save();
+
+//     // Build reset URL
+//     const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
+
+//     // Send email via SendGrid
+//     await sgMail.send({
+//       to: user.email,
+//       from: "ashinde354@gmail.com", // must be verified in SendGrid
+//       subject: "Password Reset Request",
+//       html: `
+//         <p>Hello ${user.name},</p>
+//         <p>You requested a password reset. Click the link below to reset your password. Token expires in 1 hour.</p>
+//         <p><a href="${resetURL}">Reset Password</a></p>
+//       `,
+//     });
+
+//     // Respond to frontend
+//     res.json({ message: "Reset link sent to your email" });
+
+//   } catch (err) {
+//     console.error("SendGrid error:", err);
+//     res.status(500).json({ message: "Could not send reset email. Contact admin." });
+//   }
+// };
 // resetpass
 exports.resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
