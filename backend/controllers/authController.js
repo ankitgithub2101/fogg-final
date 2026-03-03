@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 
 
 // Temporary login attempt tracker (in-memory)
@@ -113,8 +113,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 exports.forgotPasswordEmail = async (req, res) => {
   const { email, favFood } = req.body;
 
-  if (!email || !favFood)
-    return res.status(400).json({ message: "Email and favFood required" });
+  if (!email || !favFood) {
+    return res.status(400).json({ message: "Email and favorite food are required" });
+  }
 
   try {
     const user = await User.findOne({ email });
@@ -130,6 +131,7 @@ exports.forgotPasswordEmail = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
+    // Build reset URL
     const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
 
     // Send email via SendGrid
@@ -137,9 +139,14 @@ exports.forgotPasswordEmail = async (req, res) => {
       to: user.email,
       from: "ashinde354@gmail.com", // must be verified in SendGrid
       subject: "Password Reset Request",
-      html: `<p>Click <a href="${resetURL}">here</a> to reset your password. Token expires in 1 hour.</p>`,
+      html: `
+        <p>Hello ${user.name},</p>
+        <p>You requested a password reset. Click the link below to reset your password. Token expires in 1 hour.</p>
+        <p><a href="${resetURL}">Reset Password</a></p>
+      `,
     });
 
+    // Respond to frontend
     res.json({ message: "Reset link sent to your email" });
 
   } catch (err) {
