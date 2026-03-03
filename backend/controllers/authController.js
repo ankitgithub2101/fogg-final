@@ -142,7 +142,7 @@ transporter.verify((err, success) => {
   else console.log("Email transporter is ready");
 });
 
-      const resetURL = `http://localhost:5173/reset-password?token=${token}`;
+      const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
       await transporter.sendMail({
         to: user.email,
         subject: "Password Reset Request",
