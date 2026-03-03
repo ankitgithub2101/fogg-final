@@ -8,6 +8,11 @@ connectDB();
 
 const app = express();
 
+app.use(cors({
+  origin: "https://fogg-final.netlify.app", // allow your Netlify frontend
+  credentials: true, // if sending cookies
+}));
+
 app.use(cors());
 app.use(express.json());
 
