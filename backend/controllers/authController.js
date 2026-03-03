@@ -107,6 +107,9 @@ exports.getUsers = async (req, res) => {
 
 
 // forgetpass
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 exports.forgotPasswordEmail = async (req, res) => {
   const { email, favFood } = req.body;
 
@@ -127,40 +130,21 @@ exports.forgotPasswordEmail = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // Try sending email
-    try {
-      const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
+    const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
+
+    // Send email via SendGrid
+    await sgMail.send({
+      to: user.email,
+      from: "ashinde354@gmail.com", // must be verified in SendGrid
+      subject: "Password Reset Request",
+      html: `<p>Click <a href="${resetURL}">here</a> to reset your password. Token expires in 1 hour.</p>`,
     });
 
-transporter.verify((err, success) => {
-  if (err) console.error("Transporter verification failed:", err);
-  else console.log("Email transporter is ready");
-});
+    res.json({ message: "Reset link sent to your email" });
 
-      const resetURL = `https://fogg-final.netlify.app/reset-password?token=${token}`;
-      await transporter.sendMail({
-        to: user.email,
-        subject: "Password Reset Request",
-        html: `<p>Click <a href="${resetURL}">here</a> to reset your password. Token expires in 1 hour.</p>`,
-      });
-
-      return res.json({ message: "Reset link sent to your email" });
-    } catch (emailErr) {
-      console.error("Email sending failed:", emailErr);
-      return res.status(200).json({
-        message:
-          "Reset token generated but email could not be sent. Contact admin.",
-        token, // optional: only for testing, remove in production
-      });
-    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("SendGrid error:", err);
+    res.status(500).json({ message: "Could not send reset email. Contact admin." });
   }
 };
 // resetpass
