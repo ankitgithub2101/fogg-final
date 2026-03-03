@@ -17,9 +17,9 @@ function ForgotPassword() {
       setMessage(data.message);
 
       // ✅ Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate("/login");
+      // }, 2000);
     } catch (err) {
       console.error(err);
       setMessage(
