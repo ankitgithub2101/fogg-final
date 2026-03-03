@@ -9,7 +9,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://fogg-final.onrender.com//api",
+  baseURL: "https://fogg-final.onrender.com/api",
 });
 
 export default API;
