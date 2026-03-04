@@ -106,9 +106,9 @@ function Dashboard() {
 
       <div className="p-4 max-w-3xl mx-auto">
         {/* Upload */}
-        <div className="flex gap-2 mb-4">
-          <input type="file" onChange={handleFileChange} className="flex-1" />
-          <button onClick={handleUpload} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center">
+          <input type="file" onChange={handleFileChange} className="w-full sm:flex-1"/>
+          <button onClick={handleUpload} className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 w-full sm:w-auto">
             Upload
           </button>
         </div>
