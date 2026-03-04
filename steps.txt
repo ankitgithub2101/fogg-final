@@ -4,3 +4,11 @@ npm init -y
 npm install express mongoose bcryptjs jsonwebtoken cors dotenv
 npm install nodemon --save-dev
 npm install multer
+npm install nodemailer
+npm install @sendgrid/mail
+
+
+code for twilo
+HU8KVJUXVL249S5MMKJ2VEGN
+
+api key is twilo
